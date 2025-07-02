@@ -46,7 +46,8 @@
         }
 
         const profile = await liff.getProfile();
-        displayName = profile.displayName;
+
+        displayName = profile.userId;
 
         document.getElementById("greeting").textContent =
           `こんにちは、${displayName}さん！`;
