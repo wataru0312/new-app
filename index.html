@@ -5,17 +5,9 @@
   <title>LIFFアンケート</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    .question {
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
+    body { font-family: sans-serif; padding: 20px; }
+    .question { margin-bottom: 20px; }
+    button { padding: 10px 20px; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -42,6 +34,8 @@
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
 
   <script>
+    let displayName = "";
+
     async function main() {
       try {
         await liff.init({ liffId: "2007674644-RMqByn73" });
@@ -52,8 +46,10 @@
         }
 
         const profile = await liff.getProfile();
+        displayName = profile.displayName;
+
         document.getElementById("greeting").textContent =
-          `こんにちは、${profile.displayName}さん！`;
+          `こんにちは、${displayName}さん！`;
 
         document.getElementById("form-area").style.display = "block";
       } catch (err) {
@@ -62,7 +58,7 @@
       }
     }
 
-    function submitSurvey() {
+    async function submitSurvey() {
       const menu = document.querySelector('input[name="menu"]:checked');
       const service = document.querySelector('input[name="service"]:checked');
       if (!menu || !service) {
@@ -70,9 +66,31 @@
         return;
       }
 
-      const resultText = `ご回答ありがとうございました！\nメニュー: ${menu.value}\nサービス: ${service.value}`;
-      document.getElementById("form-area").style.display = "none";
-      document.getElementById("result").textContent = resultText;
+      const payload = {
+        name: displayName,
+        menu: menu.value,
+        service: service.value
+      };
+
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbxKEUYrSzPfDI9bo9Zp3lW51Ej9chqR3k_2sNjV15tByssis8nS2Mus18TC1jOmJ2n4ww/exec", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (res.ok) {
+          document.getElementById("form-area").style.display = "none";
+          document.getElementById("result").textContent = "ご回答ありがとうございました！";
+        } else {
+          alert("送信に失敗しました。");
+        }
+      } catch (err) {
+        console.error("送信エラー:", err);
+        alert("送信中にエラーが発生しました。");
+      }
     }
 
     main();
