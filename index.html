@@ -47,7 +47,7 @@
 
         const profile = await liff.getProfile();
 
-        displayName = profile.userId;
+        displayName = profile.displayName;
 
         document.getElementById("greeting").textContent =
           `こんにちは、${displayName}さん！`;
@@ -69,12 +69,13 @@
 
     const payload = {
       name: displayName,
+      id: profile.userId,
       menu: menu.value,
       service: service.value
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbycQkQiDRkqgQE5TyFWZneRc1JL5b78p9D-xAf8bxEyoRajdE8tQn-XKNJj1kYll9YzTg/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbySDjKMJ7TVwr2A-a5jWpw3tbeVStzOW_UbPUX7DLyhF-jr3Ng1aDfE7ZNkucIy1BpwQg/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
