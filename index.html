@@ -48,6 +48,7 @@
 
         const profile = await liff.getProfile();
 
+        userId = profile.userId;
         displayName = profile.displayName;
 
         document.getElementById("greeting").textContent =
@@ -70,7 +71,7 @@
 
     const payload = {
       name: displayName,
-      id: profile.userId,
+      id: userId,
       menu: menu.value,
       service: service.value
     };
