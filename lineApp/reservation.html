@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFFアンケート</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; font-size: 18px; }
+    .question { margin-bottom: 20px; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+<input type="date" id="date">
+<input type="time" id="time">
+<input type="text" id="name" placeholder="名前">
+<button onclick="submitReservation()">予約</button>
+
+<script>
+  function submitReservation() {
+    const data = {
+      date: document.getElementById("date").value,
+      time: document.getElementById("time").value,
+      name: document.getElementById("name").value,
+      page: 'reservation'
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycbwmj2AKNbOLyDwfeaBuGnUTqA-cbIPnYIBId8ZjkAdwneDxBpxaq0nwD7XgwyuDae89zQ/exec", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === "ok") {
+        alert("予約が完了しました！");
+        liff.closeWindow();
+      } else {
+        alert("⚠ この時間は満席です。別の時間を選んでください。");
+      }
+    });
+  }
+</script>
+</body>
+</html>
