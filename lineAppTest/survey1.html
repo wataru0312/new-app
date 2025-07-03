@@ -73,11 +73,12 @@
       name: displayName,
       id: userId,
       menu: menu.value,
-      service: service.value
+      service: service.value,
+      page:'survey1'
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbySDjKMJ7TVwr2A-a5jWpw3tbeVStzOW_UbPUX7DLyhF-jr3Ng1aDfE7ZNkucIy1BpwQg/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbz0wz9uDzzkPToxdIgkpFbzFlP8cenNYtmsQprhfloa9jJUgAPpXdZuZj5i3ZQM1EZldQ/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
