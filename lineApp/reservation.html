@@ -1,46 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LIFFアンケート</title>
+  <meta charset="UTF-8" />
+  <title>LINE予約フォーム</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    body { font-family: sans-serif; padding: 20px; font-size: 18px; }
-    .question { margin-bottom: 20px; }
-    button { padding: 10px 20px; font-size: 16px; }
-  </style>
 </head>
 <body>
-<input type="date" id="date">
-<input type="time" id="time">
-<input type="text" id="name" placeholder="名前">
-<button onclick="submitReservation()">予約</button>
+  <h2>予約フォーム</h2>
+  <input type="date" id="date" /><br />
+  <input type="time" id="time" /><br />
+  <button id="submit">予約する</button>
 
-<script>
-  function submitReservation() {
-    const data = {
-      date: document.getElementById("date").value,
-      time: document.getElementById("time").value,
-      name: document.getElementById("name").value,
-      page: 'reservation'
-    };
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby3kjOKg1HApDor8pt3SeHbb82cxhx2H2zsRyeUBb78szOW_uK-I2ecESqDkAJfuTTb6w/exec";
 
-    fetch("https://script.google.com/macros/s/AKfycbwmj2AKNbOLyDwfeaBuGnUTqA-cbIPnYIBId8ZjkAdwneDxBpxaq0nwD7XgwyuDae89zQ/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(data),
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === "ok") {
-        alert("予約が完了しました！");
-        liff.closeWindow();
-      } else {
-        alert("⚠ この時間は満席です。別の時間を選んでください。");
-      }
-    });
-  }
-</script>
+    async function main() {
+      await liff.init({ liffId: "2007674644-jAopPezO" });
+
+      const profile = await liff.getProfile();
+      const userName = profile.displayName;
+
+      document.getElementById("submit").addEventListener("click", async () => {
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+
+        if (!date || !time) {
+          alert("日付と時間を入力してください");
+          return;
+        }
+
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: userName,
+            date: date,
+            time: time,
+            page: 'reservation'
+          })
+        });
+
+        const result = await res.json();
+        if (result.status === "ok") {
+          alert("予約完了しました！");
+          liff.closeWindow();
+        } else {
+          alert("失敗: " + result.message);
+        }
+      });
+    }
+
+    main();
+  </script>
 </body>
 </html>
