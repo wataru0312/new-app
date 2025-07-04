@@ -17,6 +17,11 @@
     async function main() {
       await liff.init({ liffId: "2007674644-jAopPezO" });
 
+      if (!liff.isLoggedIn()) {
+        liff.login(); // 必須！
+        return; // ログイン後に再読み込みされる
+      }
+
       const profile = await liff.getProfile();
       const userName = profile.displayName;
 
