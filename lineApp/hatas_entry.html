@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LIFFアンケート</title>
-  <script src="https://static.line-scdn.net/liff/2.2.0/sdk.js"></script>
+  <title>LIFFアンケート </title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; font-size: 18px; }
     .question { margin-bottom: 20px; }
@@ -35,16 +35,11 @@
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
 
   <script>
-    // 自身のLIFF IDとGASのウェブアプリURLに置き換えてください
-    const LIFF_ID = "2007674644-RMqByn73";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec";
-
-    let userId = "";
     let displayName = "";
 
     async function main() {
       try {
-        await liff.init({ liffId: LIFF_ID });
+        await liff.init({ liffId: "2007867087-B6Vy7nGv" });
 
         if (!liff.isLoggedIn()) {
           liff.login();
@@ -52,10 +47,13 @@
         }
 
         const profile = await liff.getProfile();
+
         userId = profile.userId;
         displayName = profile.displayName;
 
-        document.getElementById("greeting").textContent = `こんにちは、${displayName}さん！`;
+        document.getElementById("greeting").textContent =
+          `こんにちは、${displayName}さん！`;
+
         document.getElementById("form-area").style.display = "block";
       } catch (err) {
         document.getElementById("greeting").textContent = "LIFF初期化に失敗しました。";
@@ -64,51 +62,41 @@
     }
 
     async function submitSurvey() {
-      const menu = document.querySelector('input[name="menu"]:checked');
-      const service = document.querySelector('input[name="service"]:checked');
-
-      if (!menu || !service) {
-        alert("すべての質問に回答してください。");
-        return;
-      }
-
-      const payload = {
-        name: displayName,
-        id: userId,
-        menu: menu.value,
-        service: service.value,
-        page: "survey1"
-      };
-
-      try {
-        const response = await fetch(GAS_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error('GASからの応答が正常ではありません。');
-        }
-
-        const result = await response.json();
-        if (result.result === 'success') {
-          document.getElementById("form-area").style.display = "none";
-          document.getElementById("result").textContent = "ご回答ありがとうございました！";
-        } else {
-          document.getElementById("result").textContent = "GASからの応答にエラーがあります。";
-          console.error('GASからの応答エラー:', result.message);
-        }
-
-      } catch (err) {
-        console.error("送信エラー:", err);
-        document.getElementById("result").textContent = "送信中にエラーが発生しました。";
-      }
+    const menu = document.querySelector('input[name="menu"]:checked');
+    const service = document.querySelector('input[name="service"]:checked');
+    if (!menu || !service) {
+      alert("すべての質問に回答してください。");
+      return;
     }
-    
-    main();
-  </script>
+
+    const payload = {
+      name: displayName,
+      id: userId,
+      menu: menu.value,
+      service: service.value,
+      page:'survey1'
+    };
+
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      // fetch 成功とみなして表示を切り替える
+      document.getElementById("form-area").style.display = "none";
+      document.getElementById("result").textContent = "ご回答ありがとうございました！";
+
+    } catch (err) {
+      console.error("送信エラー:", err);
+      alert("送信中にエラーが発生しました。");
+    }
+  }
+  main();
+</script>
 </body>
 </html>
