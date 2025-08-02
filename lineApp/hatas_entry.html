@@ -1,90 +1,114 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>スプレッドシートテスト</title>
-  </head>
-  <body>
-    <h2>スプレッドシートテスト</h2>
-    <div id="userInfo" style="display: none;">
-      <p>ユーザーID: <span id="displayUserId"></span></p>
-      <p>ユーザー名: <span id="displayUserName"></span></p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFFアンケート</title>
+  <script src="https://static.line-scdn.net/liff/2.2.0/sdk.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; font-size: 18px; }
+    .question { margin-bottom: 20px; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2 id="greeting">読み込み中...</h2>
+
+  <div id="form-area" style="display: none;">
+    <div class="question">
+      <p><strong>Q1. 好きなメニューは？</strong></p>
+      <label><input type="radio" name="menu" value="ラーメン"> ラーメン</label><br>
+      <label><input type="radio" name="menu" value="うどん"> うどん</label><br>
+      <label><input type="radio" name="menu" value="そば"> そば</label>
     </div>
-    <button id="btnRecord">テスト記録</button>
-    <p id="status"></p>
 
-    <script src="https://static.line-scdn.net/liff/2.2.0/sdk.js"></script>
-    <script>
-      // LIFF IDとGASのURLを各自のものに置き換えてください
-      const LIFF_ID = '2007867087-B6Vy7nGv';
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec'; // GASのウェブアプリURLに置き換え
+    <div class="question">
+      <p><strong>Q2. 利用したいサービスは？</strong></p>
+      <label><input type="radio" name="service" value="占い"> 占い</label><br>
+      <label><input type="radio" name="service" value="クーポン"> クーポン</label><br>
+      <label><input type="radio" name="service" value="ポイント"> ポイント</label>
+    </div>
 
-      let userId = '';
-      let userName = '';
-      const btn = document.getElementById('btnRecord');
-      const statusElem = document.getElementById('status');
-      const userInfoDiv = document.getElementById('userInfo');
-      const displayUserId = document.getElementById('displayUserId');
-      const displayUserName = document.getElementById('displayUserName');
+    <button onclick="submitSurvey()">送信</button>
+  </div>
 
-      async function initializeLiff() {
-        try {
-          await liff.init({ liffId: LIFF_ID });
-          if (liff.isLoggedIn()) {
-            const profile = await liff.getProfile();
-            userId = profile.userId;
-            userName = profile.displayName;
-            
-            displayUserId.textContent = userId;
-            displayUserName.textContent = userName;
-            userInfoDiv.style.display = 'block';
-            
-          } else {
-            liff.login();
-          }
-        } catch (err) {
-          console.error(err);
-          statusElem.textContent = 'LIFFの初期化に失敗しました。';
-        }
-      }
+  <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
 
-      btn.onclick = async () => {
-        if (!userId) {
-          statusElem.textContent = 'ユーザー情報を取得できませんでした。LIFFアプリを再起動してください。';
+  <script>
+    // 自身のLIFF IDとGASのウェブアプリURLに置き換えてください
+    const LIFF_ID = "2007674644-RMqByn73";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec";
+
+    let userId = "";
+    let displayName = "";
+
+    async function main() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
           return;
         }
-        btn.disabled = true;
-        statusElem.textContent = '通信中...';
 
-        try {
-          const response = await fetch(GAS_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId, userName }),
-          });
+        const profile = await liff.getProfile();
+        userId = profile.userId;
+        displayName = profile.displayName;
 
-          if (!response.ok) {
-            throw new Error('GASからの応答が正常ではありません。');
-          }
+        document.getElementById("greeting").textContent = `こんにちは、${displayName}さん！`;
+        document.getElementById("form-area").style.display = "block";
+      } catch (err) {
+        document.getElementById("greeting").textContent = "LIFF初期化に失敗しました。";
+        console.error(err);
+      }
+    }
 
-          const result = await response.json();
-          if (result.result === 'success') {
-            statusElem.textContent = 'テスト記録が完了しました！';
-          } else {
-            statusElem.textContent = 'GASからの応答にエラーがあります。';
-          }
+    async function submitSurvey() {
+      const menu = document.querySelector('input[name="menu"]:checked');
+      const service = document.querySelector('input[name="service"]:checked');
 
-        } catch (error) {
-          statusElem.textContent = '通信エラーが発生しました。詳細はコンソールを確認してください。';
-          console.error(error);
-        } finally {
-          btn.disabled = false;
-        }
+      if (!menu || !service) {
+        alert("すべての質問に回答してください。");
+        return;
+      }
+
+      const payload = {
+        name: displayName,
+        id: userId,
+        menu: menu.value,
+        service: service.value,
+        page: "survey1"
       };
 
-      initializeLiff();
-    </script>
-  </body>
+      try {
+        const response = await fetch(GAS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error('GASからの応答が正常ではありません。');
+        }
+
+        const result = await response.json();
+        if (result.result === 'success') {
+          document.getElementById("form-area").style.display = "none";
+          document.getElementById("result").textContent = "ご回答ありがとうございました！";
+        } else {
+          document.getElementById("result").textContent = "GASからの応答にエラーがあります。";
+          console.error('GASからの応答エラー:', result.message);
+        }
+
+      } catch (err) {
+        console.error("送信エラー:", err);
+        document.getElementById("result").textContent = "送信中にエラーが発生しました。";
+      }
+    }
+    
+    main();
+  </script>
+</body>
 </html>
