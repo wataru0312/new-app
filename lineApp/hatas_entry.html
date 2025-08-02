@@ -29,7 +29,7 @@
       <label><input type="radio" name="service" value="ポイント"> ポイント</label>
     </div>
 
-    <button onclick="submitSurvey()">来店しました。</button>
+    <button onclick="submitSurvey()">送信</button>
   </div>
 
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
@@ -72,12 +72,15 @@
     const payload = {
       userName: displayName,
       userId: userId,
+      menu: menu.value,
+      service: service.value,
+      page:'survey1'
     };
 
     try {
       await fetch("https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec", {
         method: "POST",
-        mode: "no-cors",
+        // mode: "no-cors",
         headers: {
           "Content-Type": "application/json"
         },
