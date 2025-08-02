@@ -69,19 +69,22 @@
       return;
     }
 
-    const data = {
+    const payload = {
       userName: displayName,
       userId: user_id,
+      menu: menu.value,
+      service: service.value,
+      page:'survey1'
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbwk3c1XWMNPcjqiZjB0btCugi_koHjRsOz7eNpx3LthTvmrOQdpxkIZVblQiUpPWmk/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbyHTslux9dgOGzgr9siDWZNqErdgdUwM94RiJjlgYIpjSq1KuTKubooXSi9zf-dqYM/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       });
 
       // fetch 成功とみなして表示を切り替える
