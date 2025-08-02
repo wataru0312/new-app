@@ -1,127 +1,90 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>スプレッドシートテスト</title>
-</head>
-<body>
-  <h2>スプレッドシートテスト</h2>
-  <button id="btnRecord">テスト記録</button>
-  <p id="status"></p>
+  <head>
+    <meta charset="utf-8">
+    <title>スプレッドシートテスト</title>
+  </head>
+  <body>
+    <h2>スプレッドシートテスト</h2>
+    <div id="userInfo" style="display: none;">
+      <p>ユーザーID: <span id="displayUserId"></span></p>
+      <p>ユーザー名: <span id="displayUserName"></span></p>
+    </div>
+    <button id="btnRecord">テスト記録</button>
+    <p id="status"></p>
 
-  <script>
-    // 公開済みのWebアプリURLに置き換え
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxbnw4Zdm21iQoEuttPfXxvgF-NMf42J4LlymdqaqqiJXef_t0nH4hX9w/exec';
+    <script src="https://static.line-scdn.net/liff/2.2.0/sdk.js"></script>
+    <script>
+      // LIFF IDとGASのURLを各自のものに置き換えてください
+      const LIFF_ID = '2007867087-B6Vy7nGv';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbwz.../exec'; // GASのウェブアプリURLに置き換え
 
-    const userId = 'test_user_id';
-    const userName = 'テスト太郎';
+      let userId = '';
+      let userName = '';
+      const btn = document.getElementById('btnRecord');
+      const statusElem = document.getElementById('status');
+      const userInfoDiv = document.getElementById('userInfo');
+      const displayUserId = document.getElementById('displayUserId');
+      const displayUserName = document.getElementById('displayUserName');
 
-    const btn = document.getElementById('btnRecord');
-
-    btn.onclick = async () => {
-      btn.disabled = true;
-      document.getElementById('status').textContent = '通信中...';
-
-      try {
-        const res = await fetch(GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, userName }),
-        });
-        const json = await res.json();
-
-        if (json.result === 'success') {
-          document.getElementById('status').textContent = 'テスト記録が完了しました！';
-        } else {
-          document.getElementById('status').textContent = 'GASからの応答にエラーがあります。';
-          console.error(json);
+      async function initializeLiff() {
+        try {
+          await liff.init({ liffId: LIFF_ID });
+          if (liff.isLoggedIn()) {
+            const profile = await liff.getProfile();
+            userId = profile.userId;
+            userName = profile.displayName;
+            
+            displayUserId.textContent = userId;
+            displayUserName.textContent = userName;
+            userInfoDiv.style.display = 'block';
+            
+          } else {
+            liff.login();
+          }
+        } catch (err) {
+          console.error(err);
+          statusElem.textContent = 'LIFFの初期化に失敗しました。';
         }
-      } catch (e) {
-        document.getElementById('status').textContent = '通信エラーが発生しました。';
-        console.error(e);
-      } finally {
-        btn.disabled = false;
       }
-    };
-  </script>
-</body>
+
+      btn.onclick = async () => {
+        if (!userId) {
+          statusElem.textContent = 'ユーザー情報を取得できませんでした。LIFFアプリを再起動してください。';
+          return;
+        }
+        btn.disabled = true;
+        statusElem.textContent = '通信中...';
+
+        try {
+          const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, userName }),
+          });
+
+          if (!response.ok) {
+            throw new Error('GASからの応答が正常ではありません。');
+          }
+
+          const result = await response.json();
+          if (result.result === 'success') {
+            statusElem.textContent = 'テスト記録が完了しました！';
+          } else {
+            statusElem.textContent = 'GASからの応答にエラーがあります。';
+          }
+
+        } catch (error) {
+          statusElem.textContent = '通信エラーが発生しました。詳細はコンソールを確認してください。';
+          console.error(error);
+        } finally {
+          btn.disabled = false;
+        }
+      };
+
+      initializeLiff();
+    </script>
+  </body>
 </html>
-
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>来店記録アプリ</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-</head>
-<body>
-  <h2>来店ありがとうございます！</h2>
-  <button id="btnRecord" disabled>来店を記録する</button>
-  <p id="status"></p>
-
-  <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycby9bDFbsaJjo2Er9FwJpEIY41xo4ho55WRoFkX3LeMhqYbkGt--VoN6EG_RaFlQNhpo/exec'; // 公開済みのWebアプリURLに置き換え
-    const FRIEND_ADD_URL = 'https://lin.ee/HP6W8NM';
-
-    async function checkFriendStatus(userId) {
-      // とりあえず常にtrue返すダミー実装
-      return true;
-    }
-
-    async function main() {
-      try {
-        await liff.init({ liffId: '2007867087-B6Vy7nGv' });
-
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
-
-        const profile = await liff.getProfile();
-        const userId = profile.userId;
-        const userName = profile.displayName;
-
-        // 友だち判定
-        const isFriend = await checkFriendStatus(userId);
-
-        if (!isFriend) {
-          if (confirm("まだ友だち登録されていません。友だち登録ページを開きますか？")) {
-            liff.openWindow({ url: FRIEND_ADD_URL });
-          }
-          document.getElementById('status').textContent = '友だち登録が必要です。';
-          return;
-        }
-
-        // 友だちならボタン有効化
-        const btn = document.getElementById('btnRecord');
-        btn.disabled = false;
-
-        btn.onclick = async () => {
-          btn.disabled = true;
-          document.getElementById('status').textContent = '通信中...';
-
-          try {
-            const res = await fetch(GAS_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, userName }),
-            });
-            const json = await res.json();
-
-            document.getElementById('status').textContent = '来店記録が完了しました。ありがとうございます！';
-          } catch (e) {
-            document.getElementById('status').textContent = '通信エラーが発生しました。';
-            btn.disabled = false;
-          }
-        };
-
-      } catch (e) {
-        document.getElementById('status').textContent = '初期化エラーが発生しました。';
-        console.error(e);
-      }
-    }
-
-    main();
-  </script>
-</body>
-</html> -->
