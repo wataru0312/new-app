@@ -69,12 +69,9 @@
       return;
     }
 
-    const payload = {
+    const data = {
       userName: displayName,
       userId: user_id,
-      menu: menu.value,
-      service: service.value,
-      page:'survey1'
     };
 
     try {
@@ -84,7 +81,7 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(data)
       });
 
       // fetch 成功とみなして表示を切り替える
