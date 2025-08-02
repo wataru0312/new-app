@@ -2,8 +2,57 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <title>スプレッドシートテスト</title>
+</head>
+<body>
+  <h2>スプレッドシートテスト</h2>
+  <button id="btnRecord">テスト記録</button>
+  <p id="status"></p>
+
+  <script>
+    // 公開済みのWebアプリURLに置き換え
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycby9bDFbsaJjo2Er9FwJpEIY41xo4ho55WRoFkX3LeMhqYbkGt--VoN6EG_RaFlQNhpo/exec';
+
+    const userId = 'test_user_id';
+    const userName = 'テスト太郎';
+
+    const btn = document.getElementById('btnRecord');
+
+    btn.onclick = async () => {
+      btn.disabled = true;
+      document.getElementById('status').textContent = '通信中...';
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, userName }),
+        });
+        const json = await res.json();
+
+        if (json.result === 'success') {
+          document.getElementById('status').textContent = 'テスト記録が完了しました！';
+        } else {
+          document.getElementById('status').textContent = 'GASからの応答にエラーがあります。';
+          console.error(json);
+        }
+      } catch (e) {
+        document.getElementById('status').textContent = '通信エラーが発生しました。';
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
   <title>来店記録アプリ</title>
-  <!-- <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script> -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
   <h2>来店ありがとうございます！</h2>
@@ -75,4 +124,4 @@
     main();
   </script>
 </body>
-</html>
+</html> -->
