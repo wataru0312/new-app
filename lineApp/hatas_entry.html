@@ -78,9 +78,10 @@
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbzblc7o44W68rKait_k3zOi9EGIBxyZ33-pqeNxniNCCw-Kg81JNie7Mk7GsaEUZGMe/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbzQH2_55g4KxAuF8bHIQWD69f8EQ3N3kNBdWrvxdVDfqzRDtJ5NYYMMAPonEA7bf1V3/exec", {
         method: "POST",
         // mode: "no-cors",
+        mode: "cors",
         headers: {
           "Content-Type": "application/json"
         },
