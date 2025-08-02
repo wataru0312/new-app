@@ -29,7 +29,7 @@
       <label><input type="radio" name="service" value="ポイント"> ポイント</label>
     </div>
 
-    <button onclick="submitSurvey()">送信</button>
+    <button onclick="submitSurvey()">来店しました。</button>
   </div>
 
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
@@ -70,11 +70,8 @@
     }
 
     const payload = {
-      name: displayName,
-      id: userId,
-      menu: menu.value,
-      service: service.value,
-      page:'survey1'
+      userName: displayName,
+      userId: userId,
     };
 
     try {
