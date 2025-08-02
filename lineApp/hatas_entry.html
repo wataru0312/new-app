@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>来店記録アプリ</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h2>来店ありがとうございます！</h2>
+  <button id="btnRecord" disabled>来店を記録する</button>
+  <p id="status"></p>
+
+  <script>
+    async function main() {
+      await liff.init({ liffId: '2007867087-B6Vy7nGv' });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      const userId = profile.userId;
+      const userName = profile.displayName;
+
+      // GAS API URL
+      const GAS_URL = 'https://script.google.com/macros/library/d/17uoOAme8x5DIfxPD45X6AbqEU_gK9p-VvKW5dc5ZwSXUZALiSd1QqZxd/1';
+
+      // 友だち追加URL（公式LINEアカウントの友だち追加リンク）
+      const FRIEND_ADD_URL = 'https://lin.ee/HP6W8NM';
+
+      // 友だち判定用にAPIへユーザーID確認リクエストをする方法もあるが、ここでは単純に記録済みかはGASで判断
+
+      document.getElementById('btnRecord').disabled = false;
+
+      document.getElementById('btnRecord').onclick = async () => {
+        try {
+          const res = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, userName })
+          });
+          const json = await res.json();
+
+          document.getElementById('status').textContent = '来店記録が完了しました。ありがとうございます！';
+          document.getElementById('btnRecord').disabled = true;
+        } catch (e) {
+          document.getElementById('status').textContent = '通信エラーが発生しました。';
+        }
+      };
+
+      // もしここで友だちでない判定が必要なら別途APIを用意して判定し、
+      // 友だちでなければ以下のように友だち追加ページへ誘導できます
+      const isFriend = await checkFriendStatus(userId);
+      if (!isFriend) {
+        if (confirm("まだ友だち登録されていません。友だち登録ページを開きますか？")) {
+          liff.openWindow({ url: FRIEND_ADD_URL });
+        }
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>
