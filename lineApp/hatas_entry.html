@@ -48,13 +48,6 @@
     }
 
     async function submitSurvey() {
-    const menu = document.querySelector('input[name="menu"]:checked');
-    const service = document.querySelector('input[name="service"]:checked');
-    if (!menu || !service) {
-      alert("すべての質問に回答してください。");
-      return;
-    }
-
     const payload = {
       userName: displayName,
       userId: user_id
