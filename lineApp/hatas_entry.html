@@ -15,21 +15,7 @@
   <h2 id="greeting">読み込み中...</h2>
 
   <div id="form-area" style="display: none;">
-    <div class="question">
-      <p><strong>Q1. 好きなメニューは？</strong></p>
-      <label><input type="radio" name="menu" value="ラーメン"> ラーメン</label><br>
-      <label><input type="radio" name="menu" value="うどん"> うどん</label><br>
-      <label><input type="radio" name="menu" value="そば"> そば</label>
-    </div>
-
-    <div class="question">
-      <p><strong>Q2. 利用したいサービスは？</strong></p>
-      <label><input type="radio" name="service" value="占い"> 占い</label><br>
-      <label><input type="radio" name="service" value="クーポン"> クーポン</label><br>
-      <label><input type="radio" name="service" value="ポイント"> ポイント</label>
-    </div>
-
-    <button onclick="submitSurvey()">送信</button>
+    <button onclick="submitSurvey()">来店しました。</button>
   </div>
 
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
@@ -86,7 +72,7 @@
 
       // fetch 成功とみなして表示を切り替える
       document.getElementById("form-area").style.display = "none";
-      document.getElementById("result").textContent = "ご回答ありがとうございました！";
+      document.getElementById("result").textContent = "ご来店誠にありがとうございます！";
 
     } catch (err) {
       console.error("送信エラー:", err);
