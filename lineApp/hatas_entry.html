@@ -18,11 +18,11 @@
     <button onclick="submitSurvey()">来店しました。</button>
   </div>
 
+
+
   <p id="result" style="font-weight: bold; margin-top: 20px;"></p>
 
   <script>
-    let displayName = "";
-
     async function main() {
       try {
         await liff.init({ liffId: "2007867087-B6Vy7nGv" });
@@ -64,8 +64,9 @@
       });
 
       // fetch 成功とみなして表示を切り替える
-      document.getElementById("form-area").style.display = "none";
-      document.getElementById("result").textContent = "ご来店誠にありがとうございます！";
+      window.location.href('./hatas_entered.html');
+      // document.getElementById("form-area").style.display = "none";
+      // document.getElementById("result").textContent = "ご来店誠にありがとうございます！";
 
     } catch (err) {
       console.error("送信エラー:", err);
